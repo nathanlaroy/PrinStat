@@ -154,11 +154,15 @@ ggarrange(plot_hist_transformed, plot_boxplot_transformed)
 
 ------------------------------------------------------------------------
 
-To construct the **likelihood function** we assume that the data originates from a Fréchet probability distribution. We proceed as follows: recall from the question 1 that the probability density function is given by
+To construct the **likelihood function** we assume that the data originates from a Fréchet probability distribution. We proceed as follows: recall from question 1 that the probability density function is given by
 
-$$\frac{\zeta}{\sigma} 
+$$
+\begin{aligned}
+f(x) &= \frac{\zeta}{\sigma} 
   \left(\frac{x-\mu}{\sigma}\right)^{-1-\zeta}
-  \exp \left[ -\left(\frac{x-\mu}{\sigma}\right)^{-\zeta} \right],$$
+  \exp \left[ -\left(\frac{x-\mu}{\sigma}\right)^{-\zeta} \right]
+\end{aligned}
+$$
 
 and that we are allowed to rely on mathematical simplifications because of the i.i.d. assumption (the observations are mutually independent, but identically distributed). Thus, using the multiplication rule we find:
 
@@ -198,25 +202,24 @@ $$
 
 The following mathematical rules were applied per step:
 
-1 > 4) Properties of logarithms (log of a division, log of an exponentiated term, log of ln()).
+1 \> 4) Properties of logarithms (log of a division, log of an exponentiated term, log of ln()).
 
-5) Distribute $(-1-\zeta)$ over $[\log(x_i-\mu) - \log(\sigma)]$.
+5)  Distribute $(-1-\zeta)$ over $[\log(x_i-\mu) - \log(\sigma)]$.
 
-6) Distribute $\log(\sigma)$ over $(-1-\zeta)$, and resolve with preceding $-$ sign.
+6)  Distribute $\log(\sigma)$ over $(-1-\zeta)$, and resolve with preceding $-$ sign.
 
-7) Cancel $-\log(\sigma) + \log(\sigma)$ and reorder terms (in)dependent of $x_i$ within summation for visual ease.
+7)  Cancel $-\log(\sigma) + \log(\sigma)$ and reorder terms (in)dependent of $x_i$ within summation for visual ease.
 
-8) Extract $x_i$-independent terms from summation (multiplying by $n$).
+8)  Extract $x_i$-independent terms from summation (multiplying by $n$).
 
-9) Put minus before summation sign, so as to remove all minus signs from within summation (easier for later partial derivation).
+9)  Put minus before summation sign, so as to remove all minus signs from within summation (easier for later partial derivation).
 
 ------------------------------------------------------------------------
 
 3.  **Make a plot of the log-likelihood function as a function of the scale parameter. You may assume that the other two parameters are known:** $\mu = 122$ and $\zeta = 1.2$.
 
-
 ```{r, eval=FALSE}
-hr[34] # dit is de waarde die voor problemen zorgt omdat dit gelijk is aan mu
+hr[34] <- 122 # dit is de waarde die voor problemen zorgt omdat dit gelijk is aan mu
 # dus log(122-122) = log(0) = -inf
 
 loglik <- function(sigma, x) {
@@ -243,25 +246,35 @@ ggplot(data, aes(x = sigma, y = loglik)) +
 
 ------------------------------------------------------------------------
 
-To arrive at an analytical expression for the MLE of the scale parameter $\sigma$, we proceed as follows. Starting from the log-likelihood function derived earlier:
+To arrive at an analytic expression for the MLE of the scale parameter $\sigma$, we proceed as follows, starting from the log-likelihood function derived earlier:
 
 $$
 l(\mu,\sigma,\zeta) = n \log(\zeta) + n \zeta \log(\sigma) - \sum_{n=1}^{n} (1+\zeta) 
-\log(x_i-\mu) + \left(\frac{x_i-\mu}{\sigma}\right)^{-\zeta}
-$$
-
-we calculate the partial derivative of $l(\mu, \sigma, \zeta)$ with respect to $\sigma$.
+\log(x_i-\mu) + \left(\frac{x_i-\mu}{\sigma}\right)^{-\zeta} \space\space,
+$$ we calculate the partial derivative of $l(\mu, \sigma, \zeta)$ with respect to $\sigma$.
 
 $$
 \begin{aligned}
 \frac{\partial l}{\partial \sigma}
-&= \frac{\partial}{\partial\sigma} n\zeta \log(\sigma) - \frac{\partial}{\partial\sigma}\sum_{i=1}^{n} (1+\zeta) \log(x_i-\mu) + \left( \frac{x_i-\mu}{\sigma}\right)^{-\zeta}=0\\
+&= \frac{\partial}{\partial\sigma} \left(n\log(\zeta) \space + \space n\zeta \log(\sigma) \right)- \frac{\partial}{\partial\sigma}\sum_{i=1}^{n} (1+\zeta) \log(x_i-\mu) + \left( \frac{x_i-\mu}{\sigma}\right)^{-\zeta} = 0\\
 &= \frac{n\zeta}{\sigma} - \sum_{i=1}^{n} \frac{\partial}{\partial\sigma} \left( \frac{x_i-\mu}{\sigma}\right)^{-\zeta} = 0\\
 &= \frac{n\zeta}{\sigma} - \sum_{i=1}^{n}  (-\zeta) \left(
 \frac{x_i-\mu}{\sigma}\right)^{-\zeta-1} \left(- \frac{x_i-\mu}{\sigma^2}\right) = 0\\
-0 &= \frac{n\zeta}{\sigma} - \sum_{i=1}^{n} \zeta\left(\frac{x_i-\mu}{\sigma}\right)^{-\zeta-1} \left(\frac{x_i-\mu}{\sigma^2}\right) \\
+&= \frac{n\zeta}{\sigma} - \sum_{i=1}^{n} \zeta\left(\frac{x_i-\mu}{\sigma}\right)^{-\zeta-1} \left(\frac{x_i-\mu}{\sigma^2}\right) = 0\\
 \end{aligned}
-$$
+$$ 
+
+The following mathematical rules were applied per step: 
+
+1) Derivative of a sum is sum of derivatives.
+
+2)  All terms without $\sigma$ resolve to zero. Derivative of $a\space\cdot\space\log(x)$ is $\frac{a}{x}$.
+
+3)  Chain rule: first derive with respect to $a = \frac{x_i-\mu}{\sigma}$, multiplied by derivative of $a$ with respect to $\sigma$.
+
+4)  Cancel out the negative signs within the summation.
+
+From this result, we isolate $\sigma$: 
 $$
 \begin{aligned}
 0 &= \frac{n\zeta}{\sigma} - \sum_{i=1}^{n} \zeta\left(\frac{x_i-\mu}{\sigma}\right)^{-\zeta-1} \left(\frac{x_i-\mu}{\sigma^2}\right)\\
@@ -270,26 +283,44 @@ $$
 \frac{n\zeta}{\sigma} &= \frac{\zeta}{\sigma^{-\zeta+1}} \sum_{i=1}^{n}(x_i-\mu)^{-\zeta}\\
 \frac{\sigma^{-\zeta+1}}{\sigma} &= \frac{1}{n} \sum_{i=1}^{n} (x_i-\mu)^{-\zeta}\\
 \sigma^{\zeta} &= \frac{n}{\sum_{i=1}^{n} (x_i-\mu)^{-\zeta}}\\
-\sigma &= \sqrt[\leftroot{-1}\uproot{2}\zeta]{n \sum_{i=1}^{n} (x_i-\mu)^{\zeta}} \\
-\sigma &= \sqrt[\leftroot{-1}\uproot{2}\zeta]{n} \space \cdot \space \sum_{i=1}^{n}(x_i-\mu)
+\sigma &= \sqrt[\leftroot{-1}\uproot{2}\zeta]{\frac{n}{\sum_{i=1}^{n} (x_i-\mu)^{-\zeta}}} \\
 \end{aligned}
 $$
 
-4.  **Calculate the maximum likelihood estimate of scale parameter. Use two methods: (1) via the formula derived in the previous question; (2) via numerical optimisation in R (e.g. with the `optim` function).**
+The following mathematical rules were applied per step:
+
+1)  Set partial derivative of $l(\mu, \sigma, \zeta)$ with respect to $\sigma$ to zero.
+
+2)  Isolate first term containing $\sigma$. Distribute exponent $-\zeta-1$ among numinator and denominator of fraction.
+
+3)  Reassemble factors such that all $\sigma$ and all $(x_i-\mu)$ are together.
+
+4)  Apply product rule on exponents with shared bases for both all $\sigma$ and all $(x_i-\mu)$, and put $x_i$-independent factor in front of summation sign.
+
+5)  Isolate $\sigma$ to left of equation, and $\zeta$ to right, and apply product rule of exponents with shared bases.
+
+6)  Apply product rule of exponents with shared bases on $\sigma$, and raise both sides of the equation to the power of $-1$.
+
+7)  Take $\zeta$-degree root of both sides of the equation to cancel left-side exponent.
+
+```{=html}
+<!-- -->
+```
+4.  **Calculate the maximum likelihood estimate of scale parameter. Use two methods: (1) via the formula derived in the previous question; (2) via numerical optimization in R (e.g. with the `optim` function).**
 
 ------------------------------------------------------------------------
 
 Calculating the MLE of the scale parameter $\sigma$ can be calculated **(1) analytically** as follows:
 
-$$
+\$\$
 
-$$ with R code this is calculated as:
+\$\$ with R code this is calculated as:
 
 ```{r}
 sqrt(length(hr)*sum((hr-122)^1.2))
 ```
 
-We can also use a **(2) numerical optimization algorithm** in `R` to solve for $/sigma$
+We can also use a **(2) numerical optimization algorithm** in `R` to solve for $\sigma$.
 
 6.  **With the estimated parameter (and the given location and shape parameters), give an estimate of the probability that the maximum heart rate is larger than 140 beats per minute.**
 
