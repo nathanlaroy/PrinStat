@@ -82,6 +82,7 @@ ggplot(as.data.frame(hr), aes(x = hr)) +
                         #title = element_text(size = 13))
 ```
 To give an estimate of data dispersion, it is also advised to employ statistics insensitive to outliers. For example, interquartile range (IQR). The IQR is defined as $p_{75}-p_{25}$ and here equals `r round(IQR(hr),3)`, which is arguably tight.
+
 ### transformation
 Sometimes, it may be advised to transform data so as to better approximate a normal distribution. We apply the popular Box-Cox power transformation procedure, which consists of finding an exponent $\lambda$ which optimizes the transformation in yielding a close to normal distribution. We employ the `boxcox()` function from `R`'s `MASS` package. Inspection of the resulting log-likelihood function over a broad interval and after zooming in on its vertex shows a maximum at $\lambda = -21.717$. We consider an estimate $\lambda$ closest to $-1$ within the 95% CI around the maximum as optimal, or here $\lambda = -17.5$.
 ```{r,  echo=F, fig.align = 'center', out.height="6cm", fig.width=7}
